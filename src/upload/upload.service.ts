@@ -1,21 +1,8 @@
-import sharp from 'sharp';
 import { Injectable } from '@nestjs/common';
-import { Upload } from './upload.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ObjectId } from 'mongodb';
-
-export interface image {
-  _id: ObjectId;
-  image: {
-    fieldname: string;
-    originalname: string;
-    encoding: string;
-    mimetype: string;
-    buffer: Buffer;
-    size: number;
-  };
-}
+import sharp from 'sharp';
+import { Upload } from './upload.schema';
 
 @Injectable()
 export class UploadService {
