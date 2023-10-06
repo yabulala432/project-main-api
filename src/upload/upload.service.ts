@@ -1,10 +1,9 @@
 import sharp from 'sharp';
 import { Injectable } from '@nestjs/common';
-import { Upload, UploadSchema } from './upload.schema';
+import { Upload } from './upload.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ObjectId, Binary } from 'mongodb';
-import { response } from 'express';
+import { ObjectId } from 'mongodb';
 
 export interface image {
   _id: ObjectId;
@@ -22,47 +21,94 @@ export interface image {
 export class UploadService {
   constructor(@InjectModel(Upload.name) private uploadModel: Model<Upload>) {}
 
-  async uploadFile(file: any): Promise<any> {
-    console.log({ file });
-    const upload = new this.uploadModel({
-      image: file,
-    });
-    return upload.save();
+  private async getDataWithTitle(title: string): Promise<Upload> {
+    const data = await this.uploadModel
+      .findOne<Upload>({ title: title })
+      .exec();
+    return data;
   }
 
-  async getImage(id: string): Promise<any> {
-    const upload = await this.uploadModel.findById<image>(id).exec();
-    return upload;
-  }
-
-  async sendQualityImage(
-    id: string,
-    res: any,
-    height?: number,
-    saturation?: number,
-    hue?: number,
-    lightness?: number,
-    sigma?: number,
-  ): Promise<any> {
-    const { image }: image = await this.getImage(id);
-    const base64String = image.buffer.toString('base64');
-    const mimeType = image.mimetype;
-    const data = Buffer.from(base64String, 'base64');
-    const resizedBuffer: Buffer = await sharp(data)
-      .resize({
-        height: height || 350,
-      })
+  private async resizeImage(buffer: Buffer): Promise<Buffer> {
+    return sharp(buffer)
+      .resize({ height: 350 })
       .modulate({
-        saturation: saturation || 5,
-        hue: hue || 25,
-        lightness: lightness || 10,
+        saturation: 5,
+        hue: 25,
+        lightness: 10,
       })
       .sharpen({
-        sigma: sigma || 1.3,
+        sigma: 1.3,
       })
       .toBuffer();
+  }
+
+  async getAmharicImage(title: string, res: any) {
+    const data = await this.getDataWithTitle(title);
+    if (!data) {
+      res.status(404).send('Not found');
+      return;
+    }
+    const { amharicImage } = data;
+    const base64String = amharicImage.buffer.toString('base64');
+    const mimeType = amharicImage.mimetype;
+    const geezBuffer = Buffer.from(base64String, 'base64');
+    const resizedBuffer: Buffer = await this.resizeImage(geezBuffer);
+    res.set('Content-Type', mimeType);
+    res.send(resizedBuffer);
+  }
+
+  async getGeezImage(title: string, res: any) {
+    const data = await this.getDataWithTitle(title);
+    if (!data) {
+      res.status(404).send('Not found');
+      return;
+    }
+    const { geezImage } = data;
+    const base64String = geezImage.buffer.toString('base64');
+    const mimeType = geezImage.mimetype;
+    const geezBuffer = Buffer.from(base64String, 'base64');
+    const resizedBuffer: Buffer = await this.resizeImage(geezBuffer);
 
     res.set('Content-Type', mimeType);
     res.send(resizedBuffer);
+  }
+
+  async getAudio(title: string, res: any) {
+    const data = await this.getDataWithTitle(title);
+    if (!data) {
+      res.status(404).send('Not found');
+      return;
+    }
+    const { audio } = data;
+    const base64String = audio.buffer.toString('base64');
+    const mimeType = audio.mimetype;
+    const audioBuffer = Buffer.from(base64String, 'base64');
+
+    res.set('Content-Type', mimeType);
+    res.send(audioBuffer);
+  }
+
+  async uploadFile(images: Express.Multer.File[], data: any): Promise<any> {
+    if (images.length === 3) {
+      if (
+        images[0].fieldname === 'amharic' &&
+        images[1].fieldname === 'geez' &&
+        images[2].fieldname === 'audio' &&
+        data.title &&
+        data.description
+      ) {
+        const upload = new this.uploadModel({
+          amharicImage: images[0],
+          geezImage: images[1],
+          audio: images[2],
+          title: data.title,
+          description: data.description,
+        });
+        return upload.save();
+      }
+      // const kdase =
+    } else {
+      return 'Please upload all the required files';
+    }
   }
 }
