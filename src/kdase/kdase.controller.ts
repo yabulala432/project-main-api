@@ -1,4 +1,9 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 
 @Controller('kdase')
-export class KdaseController {}
+export class KdaseController {
+  constructor() {}
+
+  // @Get()
+  // @Post()
+}

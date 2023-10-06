@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
 
-export interface Upload {
+export interface Kdase {
   amharicImage: Express.Multer.File;
   geezImage: Express.Multer.File;
   audio: Express.Multer.File;
@@ -10,7 +9,7 @@ export interface Upload {
 }
 
 @Schema()
-export class Upload extends Document {
+export class Kdase extends Document {
   @Prop({
     type: Object,
     required: true,
@@ -42,4 +41,4 @@ export class Upload extends Document {
   title: string;
 }
 
-export const UploadSchema = SchemaFactory.createForClass(Upload);
+export const KdaseSchema = SchemaFactory.createForClass(Kdase);
