@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
 import { KdaseController } from './kdase.controller';
 import { KdaseService } from './kdase.service';
-import { MongooseModule } from '@nestjs/mongoose';
 import { Kdase, KdaseSchema } from './kdase.schema';
 
 @Module({

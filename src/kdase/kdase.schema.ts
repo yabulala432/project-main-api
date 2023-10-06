@@ -4,7 +4,10 @@ import { Document } from 'mongoose';
 export interface Kdase {
   amharicImage: Express.Multer.File;
   geezImage: Express.Multer.File;
-  audio: Express.Multer.File;
+
+  ezlAudio: Express.Multer.File;
+  geezAudio: Express.Multer.File;
+
   description: string;
   title: string;
 }
@@ -14,30 +17,42 @@ export class Kdase extends Document {
   @Prop({
     type: Object,
     required: true,
+    unique: true,
   })
   amharicImage: Express.Multer.File;
 
   @Prop({
     type: Object,
     required: true,
+    unique: true,
   })
   geezImage: Express.Multer.File;
 
   @Prop({
     type: Object,
-    required: true,
+    // required: true,
+    unique: true,
   })
-  audio: Express.Multer.File;
+  ezlAudio: Express.Multer.File;
 
   @Prop({
     type: Object,
     required: true,
+    unique: true,
+  })
+  geezAudio: Express.Multer.File;
+
+  @Prop({
+    type: Object,
+    required: true,
+    unique: true,
   })
   description: string;
 
   @Prop({
     type: Object,
     required: true,
+    unique: true,
   })
   title: string;
 }

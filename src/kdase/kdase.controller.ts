@@ -1,3 +1,4 @@
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import {
   Body,
   Controller,
@@ -9,7 +10,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { KdaseService } from './kdase.service';
-import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('kdase')
 export class KdaseController {
@@ -19,7 +19,7 @@ export class KdaseController {
   @UseInterceptors(
     AnyFilesInterceptor({
       limits: {
-        files: 3,
+        files: 4,
         fields: 2,
       },
     }),
@@ -31,18 +31,23 @@ export class KdaseController {
     return this.uploadService.uploadFile(images, data);
   }
 
-  @Get('/amharic/:title')
+  @Get('/amharic/image/:title')
   async getAmharicImage(@Param('title') title: string, @Res() res: any) {
     return this.uploadService.getAmharicImage(title, res);
   }
 
-  @Get('/geez/:title')
+  @Get('/geez/image/:title')
   async getGeezImage(@Param('title') title: string, @Res() res: any) {
     return this.uploadService.getGeezImage(title, res);
   }
 
-  @Get('/audio/:title')
+  @Get('/geez/audio/:title')
   async getAudio(@Param('title') title: string, @Res() res: any) {
-    return this.uploadService.getAudio(title, res);
+    return this.uploadService.getGeezAudio(title, res);
+  }
+
+  @Get('/ezl/audio/:title')
+  async getEzlAudio(@Param('title') title: string, @Res() res: any) {
+    return this.uploadService.getEzlAudio(title, res);
   }
 }

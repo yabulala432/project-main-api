@@ -11,6 +11,7 @@ export class KdaseService {
     const data = await this.uploadModel.findOne<Kdase>({ title: title }).exec();
     return data;
   }
+
   private async resizeImage(buffer: Buffer): Promise<Buffer> {
     return sharp(buffer)
       .resize({ height: 350 })
@@ -24,6 +25,7 @@ export class KdaseService {
       })
       .toBuffer();
   }
+
   async getAmharicImage(title: string, res: any) {
     const data = await this.getDataWithTitle(title);
     if (!data) {
@@ -38,6 +40,7 @@ export class KdaseService {
     res.set('Content-Type', mimeType);
     res.send(resizedBuffer);
   }
+
   async getGeezImage(title: string, res: any) {
     const data = await this.getDataWithTitle(title);
     if (!data) {
@@ -52,32 +55,56 @@ export class KdaseService {
     res.set('Content-Type', mimeType);
     res.send(resizedBuffer);
   }
-  async getAudio(title: string, res: any) {
+
+  async getGeezAudio(title: string, res: any) {
     const data = await this.getDataWithTitle(title);
     if (!data) {
       res.status(404).send('Not found');
       return;
     }
-    const { audio } = data;
-    const base64String = audio.buffer.toString('base64');
-    const mimeType = audio.mimetype;
+    const { geezAudio } = data;
+    const base64String = geezAudio.buffer.toString('base64');
+    const mimeType = geezAudio.mimetype;
     const audioBuffer = Buffer.from(base64String, 'base64');
     res.set('Content-Type', mimeType);
     res.send(audioBuffer);
   }
+
+  async getEzlAudio(title: string, res: any) {
+    const data = await this.getDataWithTitle(title);
+    if (!data || !data.ezlAudio) {
+      res.status(404).send('Not found');
+      return;
+    }
+
+    const { ezlAudio } = data;
+    const base64String = ezlAudio.buffer.toString('base64');
+    const mimeType = ezlAudio.mimetype;
+    const audioBuffer = Buffer.from(base64String, 'base64');
+    res.set('Content-Type', mimeType);
+    res.send(audioBuffer);
+  }
+
   async uploadFile(images: Express.Multer.File[], data: any): Promise<any> {
-    if (images.length === 3) {
+    if (images.length === 3 || images.length === 4) {
       if (
         images[0].fieldname === 'amharic' &&
         images[1].fieldname === 'geez' &&
-        images[2].fieldname === 'audio' &&
+        images[2].fieldname === 'geezAudio' &&
         data.title &&
         data.description
       ) {
+        let ezlAudio: null | Express.Multer.File = null;
+
+        if (images[3] && images[3].fieldname === 'ezlAudio') {
+          ezlAudio = images[3];
+        }
+
         const upload = new this.uploadModel({
           amharicImage: images[0],
           geezImage: images[1],
-          audio: images[2],
+          geezAudio: images[2],
+          ezlAudio: ezlAudio || null,
           title: data.title,
           description: data.description,
         });
