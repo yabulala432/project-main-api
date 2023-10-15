@@ -135,4 +135,9 @@ export class KdaseService {
     res.set('Content-Type', mimeType);
     res.send(audioBuffer);
   }
+
+  async getAllData(): Promise<Kdase[]> {
+    const data = await this.uploadModel.find().exec();
+    return data;
+  }
 }

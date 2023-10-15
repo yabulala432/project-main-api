@@ -55,4 +55,9 @@ export class KdaseController {
   async getAllTitles() {
     return this.uploadService.getAllTitles();
   }
+
+  @Get('/getAll')
+  async getAllData() {
+    return this.uploadService.getAllData();
+  }
 }
