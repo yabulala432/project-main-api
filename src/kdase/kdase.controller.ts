@@ -50,4 +50,9 @@ export class KdaseController {
   async getEzlAudio(@Param('title') title: string, @Res() res: any) {
     return this.uploadService.getEzlAudio(title, res);
   }
+
+  @Get('/titles')
+  async getAllTitles() {
+    return this.uploadService.getAllTitles();
+  }
 }

@@ -7,6 +7,7 @@ import { Kdase } from './kdase.schema';
 @Injectable()
 export class KdaseService {
   constructor(@InjectModel(Kdase.name) private uploadModel: Model<Kdase>) {}
+
   private async getDataWithTitle(title: string): Promise<Kdase> {
     const data = await this.uploadModel.findOne<Kdase>({ title: title }).exec();
     return data;
@@ -24,6 +25,56 @@ export class KdaseService {
         sigma: 1.3,
       })
       .toBuffer();
+  }
+
+  async uploadFile(images: Express.Multer.File[], data: any): Promise<any> {
+    if (images.length === 3 || images.length === 4) {
+      if (
+        images[0].fieldname === 'amharic' &&
+        images[1].fieldname === 'geez' &&
+        images[2].fieldname === 'geezAudio' &&
+        data.title &&
+        data.description
+      ) {
+        let ezlAudio: Express.Multer.File | { file: null } = null;
+
+        if (images[3] && images[3].fieldname === 'ezlAudio') {
+          ezlAudio = images[3];
+        } else {
+          ezlAudio = null;
+        }
+
+        if (ezlAudio) {
+          const upload = new this.uploadModel({
+            amharicImage: images[0],
+            geezImage: images[1],
+            geezAudio: images[2],
+            ezlAudio: ezlAudio,
+            title: data.title,
+            description: data.description,
+          });
+          return upload.save();
+        } else {
+          const upload = new this.uploadModel({
+            amharicImage: images[0],
+            geezImage: images[1],
+            geezAudio: images[2],
+            title: data.title,
+            description: data.description,
+          });
+          console.log('ezlAudio is null');
+          return upload.save();
+        }
+      }
+    } else {
+      return 'Please upload all the required files';
+    }
+  }
+
+  async getAllTitles(): Promise<string[]> {
+    const data = await this.uploadModel.find().select('-_id title').exec();
+    const titles = data.map((d) => d.title);
+    return titles.sort();
   }
 
   async getAmharicImage(title: string, res: any) {
@@ -83,36 +134,5 @@ export class KdaseService {
     const audioBuffer = Buffer.from(base64String, 'base64');
     res.set('Content-Type', mimeType);
     res.send(audioBuffer);
-  }
-
-  async uploadFile(images: Express.Multer.File[], data: any): Promise<any> {
-    if (images.length === 3 || images.length === 4) {
-      if (
-        images[0].fieldname === 'amharic' &&
-        images[1].fieldname === 'geez' &&
-        images[2].fieldname === 'geezAudio' &&
-        data.title &&
-        data.description
-      ) {
-        let ezlAudio: null | Express.Multer.File = null;
-
-        if (images[3] && images[3].fieldname === 'ezlAudio') {
-          ezlAudio = images[3];
-        }
-
-        const upload = new this.uploadModel({
-          amharicImage: images[0],
-          geezImage: images[1],
-          geezAudio: images[2],
-          ezlAudio: ezlAudio || null,
-          title: data.title,
-          description: data.description,
-        });
-        return upload.save();
-      }
-      // const kdase =
-    } else {
-      return 'Please upload all the required files';
-    }
   }
 }

@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, SchemaType, Types } from 'mongoose';
 
 export interface Kdase {
   amharicImage: Express.Multer.File;
   geezImage: Express.Multer.File;
 
-  ezlAudio: Express.Multer.File;
+  ezlAudio: Express.Multer.File | null;
   geezAudio: Express.Multer.File;
 
   description: string;
@@ -30,8 +30,7 @@ export class Kdase extends Document {
 
   @Prop({
     type: Object,
-    // required: true,
-    unique: true,
+    required: false,
   })
   ezlAudio: Express.Multer.File;
 
