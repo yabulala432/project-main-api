@@ -30,43 +30,35 @@ export class SeatatService {
   }
 
   async uploadFile(images: Express.Multer.File[], data: any): Promise<any> {
-    if (images.length === 3 || images.length === 4) {
+    /**
+      fieldname: string;
+      originalname: string;
+      encoding: string; 
+      mimetype: string; 
+      size: number;
+      stream: Readable;
+      destination: string;
+      filename: string;
+      path: string;
+      buffer: Buffer;
+    */
+
+    if (images.length === 3) {
       if (
         images[0].fieldname === 'amharic' &&
         images[1].fieldname === 'geez' &&
-        images[2].fieldname === 'geezAudio' &&
+        images[2].fieldname === 'zema' &&
         data.title &&
         data.description
       ) {
-        let ezlAudio: Express.Multer.File | { file: null } = null;
-
-        if (images[3] && images[3].fieldname === 'ezlAudio') {
-          ezlAudio = images[3];
-        } else {
-          ezlAudio = null;
-        }
-
-        if (ezlAudio) {
-          const upload = new this.uploadModel({
-            amharicImage: images[0],
-            geezImage: images[1],
-            geezAudio: images[2],
-            ezlAudio: ezlAudio,
-            title: data.title,
-            description: data.description,
-          });
-          return upload.save();
-        } else {
-          const upload = new this.uploadModel({
-            amharicImage: images[0],
-            geezImage: images[1],
-            geezAudio: images[2],
-            title: data.title,
-            description: data.description,
-          });
-          console.log('ezlAudio is null');
-          return upload.save();
-        }
+        const upload = new this.uploadModel({
+          amharicImage: images[0],
+          geezImage: images[1],
+          zema: images[2],
+          title: data.title,
+          description: data.description,
+        });
+        return upload.save();
       }
     } else {
       return 'Please upload all the required files';
@@ -109,7 +101,8 @@ export class SeatatService {
     res.send(resizedBuffer);
   }
 
-  /**async getGeezAudio(title: string, res: any) {
+  /*
+  *async getGeezAudio(title: string, res: any) {
     const data = await this.getDataWithTitle(title);
     if (!data) {
       res.status(404).send('Not found');

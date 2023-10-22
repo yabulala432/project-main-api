@@ -5,7 +5,7 @@ export interface Seatat {
   amharicImage: Express.Multer.File;
   geezImage: Express.Multer.File;
 
-  zema: Express.Multer.File | null;
+  zema: Express.Multer.File;
 
   description: string;
   title: string;
@@ -29,7 +29,7 @@ export class Seatat extends Document {
 
   @Prop({
     type: Object,
-    required: false,
+    required: true,
   })
   zema: Express.Multer.File;
 

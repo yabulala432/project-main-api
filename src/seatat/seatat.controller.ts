@@ -9,10 +9,11 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
+
 import { SeatatService } from './seatat.service';
 
-@Controller('kdase')
-export class KdaseController {
+@Controller('seatat')
+export class SeatatController {
   constructor(private readonly uploadService: SeatatService) {}
 
   @Post('/uploadFile')
@@ -42,7 +43,8 @@ export class KdaseController {
   }
 
   @Get('/zema/audio/:title')
-  async getAudio(@Param('title') title: string, @Res() res: any) {
+  async getZema(@Param('title') title: string, @Res() res: any) {
+    console.log(title);
     return this.uploadService.getZema(title, res);
   }
 
