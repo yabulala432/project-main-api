@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, SchemaType, Types } from 'mongoose';
+import { Document } from 'mongoose';
 
 export interface Kdase {
   amharicImage: Express.Multer.File;

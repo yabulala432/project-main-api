@@ -137,7 +137,23 @@ export class KdaseService {
   }
 
   async getAllData(): Promise<Kdase[]> {
-    const data = await this.uploadModel.find().exec();
-    return data;
+    const data: any[] = await this.uploadModel.find().exec();
+    data.forEach(async (d) => {
+      d.amharicImage = `data:${
+        d.amharicImage.mimetype
+      };base64,${d.amharicImage.buffer.toString('base64')}`;
+      d.geezImage = `data:${
+        d.geezImage.mimetype
+      };base64,${d.geezImage.buffer.toString('base64')}`;
+      d.geezAudio = `data:${
+        d.geezAudio.mimetype
+      };base64,${d.geezAudio.buffer.toString('base64')}`;
+      if (d.ezlAudio) {
+        d.ezlAudio = `data:${
+          d.ezlAudio.mimetype
+        };base64,${d.ezlAudio.buffer.toString('base64')}`;
+      }
+    });
+    return data.sort((a, b) => a.title.localeCompare(b.title));
   }
 }
