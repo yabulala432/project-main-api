@@ -47,14 +47,14 @@ export class SeatatService {
       if (
         images[0].fieldname === 'amharic' &&
         images[1].fieldname === 'geez' &&
-        images[2].fieldname === 'zema' &&
+        images[2].fieldname === 'geezAudio' &&
         data.title &&
         data.description
       ) {
         const upload = new this.uploadModel({
           amharicImage: images[0],
           geezImage: images[1],
-          zema: images[2],
+          geezAudio: images[2],
           title: data.title,
           description: data.description,
         });
@@ -131,16 +131,16 @@ export class SeatatService {
     res.send(audioBuffer);
   }**/
 
-  async getZema(title: string, res: any) {
+  async getGeezAudio(title: string, res: any) {
     const data = await this.getDataWithTitle(title);
-    if (!data || !data.zema) {
+    if (!data || !data.geezAudio) {
       res.status(404).send('Not found');
       return;
     }
 
-    const { zema } = data;
-    const base64String = zema.buffer.toString('base64');
-    const mimeType = zema.mimetype;
+    const { geezAudio } = data;
+    const base64String = geezAudio.buffer.toString('base64');
+    const mimeType = geezAudio.mimetype;
     const audioBuffer = Buffer.from(base64String, 'base64');
     res.set('Content-Type', mimeType);
     res.send(audioBuffer);
@@ -148,7 +148,10 @@ export class SeatatService {
 
   async getAllData(): Promise<Seatat[]> {
     const data: any[] = await this.uploadModel.find().exec();
-    data.forEach(async (d) => {
+    if (!data) return [];
+    data.forEach((d) => {
+      // console.log(d.amharicImage);
+
       d.amharicImage = `data:${
         d.amharicImage.mimetype
       };base64,${d.amharicImage.buffer.toString('base64')}`;
@@ -158,11 +161,6 @@ export class SeatatService {
       d.geezAudio = `data:${
         d.geezAudio.mimetype
       };base64,${d.geezAudio.buffer.toString('base64')}`;
-      if (d.ezlAudio) {
-        d.ezlAudio = `data:${
-          d.ezlAudio.mimetype
-        };base64,${d.ezlAudio.buffer.toString('base64')}`;
-      }
     });
     return data.sort((a, b) => a.title.localeCompare(b.title));
   }

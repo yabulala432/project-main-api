@@ -45,7 +45,7 @@ export class SeatatController {
   @Get('/zema/audio/:title')
   async getZema(@Param('title') title: string, @Res() res: any) {
     console.log(title);
-    return this.uploadService.getZema(title, res);
+    return this.uploadService.getGeezAudio(title, res);
   }
 
   @Get('/titles')
